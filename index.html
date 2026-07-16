@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#06101e">
+  <title>大乐透摇奖模拟器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <div>
+          <p class="eyebrow">LOTTERY DRAW LAB</p>
+          <h1>大乐透摇奖模拟器</h1>
+        </div>
+      </div>
+      <div class="top-status">
+        <div class="clock-block"><small>系统时间</small><strong id="systemClock">--:--:--</strong></div>
+        <button id="roomBtn" class="room-pill"><i></i><span>联机房间</span></button>
+        <div class="live-pill"><span></span> 模拟演示</div>
+      </div>
+    </header>
+
+    <section class="stage-card">
+      <div class="stage-heading">
+        <div>
+          <span id="roundLabel" class="round-label">准备就绪</span>
+          <h2 id="stageTitle">等待启动摇奖机</h2>
+        </div>
+        <div class="heading-data">
+          <div class="draw-code"><span>模拟编号</span><strong id="drawNo">SIM-001</strong></div>
+          <div class="counter"><strong id="countdown">—</strong><span id="counterCaption">等待开始</span></div>
+        </div>
+      </div>
+
+      <div class="process-track" aria-label="摇奖流程">
+        <div class="process-step active" data-step="0"><i>01</i><span>设备自检</span></div>
+        <div class="process-line"></div>
+        <div class="process-step" data-step="1"><i>02</i><span>前区搅拌</span></div>
+        <div class="process-line"></div>
+        <div class="process-step" data-step="2"><i>03</i><span>前区出球</span></div>
+        <div class="process-line"></div>
+        <div class="process-step" data-step="3"><i>04</i><span>更换球池</span></div>
+        <div class="process-line"></div>
+        <div class="process-step" data-step="4"><i>05</i><span>后区出球</span></div>
+        <div class="process-line"></div>
+        <div class="process-step" data-step="5"><i>06</i><span>结果确认</span></div>
+      </div>
+
+      <div class="draw-workspace">
+        <div class="machine-zone">
+          <div class="machine-wrap">
+            <canvas id="machine" aria-label="摇奖机动画"></canvas>
+            <div class="machine-glow"></div>
+            <div class="stage-beam beam-left"></div>
+            <div class="stage-beam beam-right"></div>
+            <div class="machine-label"><span id="poolDot"></span><strong id="poolName">前区号码池</strong><small id="poolRange">01—35</small></div>
+            <div class="machine-floor"></div>
+          </div>
+          <div class="machine-strip">
+            <span><i class="status-led"></i>主机已连接</span>
+            <span>安全随机源 <strong>CRYPTO</strong></span>
+            <span>设备编号 <strong>DLT-M01</strong></span>
+          </div>
+        </div>
+
+        <aside class="control-console">
+          <div class="console-head"><div><small>LIVE CONTROL</small><h3>实时控制台</h3></div><span id="machineStatus" class="status-chip">待机</span></div>
+          <div class="inspection-window">
+            <div class="inspection-grid"></div>
+            <span class="window-label">出球确认窗口</span>
+            <div id="lastBallPreview" class="preview-ball empty">—</div>
+            <p id="ballMessage">等待首个号码球</p>
+          </div>
+          <div class="data-grid">
+            <div><span>当前球池</span><strong id="currentPoolStat">前区</strong></div>
+            <div><span>剩余球数</span><strong id="remainingCount">35</strong></div>
+            <div><span>运行计时</span><strong id="elapsedTime">00:00.0</strong></div>
+            <div><span>已出号码</span><strong id="drawnCount">0 / 7</strong></div>
+          </div>
+          <div class="airflow-panel">
+            <div class="panel-label"><span>气流动力</span><strong id="airflowValue">0%</strong></div>
+            <div class="airflow-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="sequence-panel">
+            <div class="panel-label"><span>本次抽取顺序</span><small>DRAW ORDER</small></div>
+            <div id="liveSequence" class="live-sequence"><em>尚未出球</em></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="result-panel" aria-live="polite">
+        <div class="result-group">
+          <div class="result-meta"><span class="red-dot"></span><strong>前区</strong><small>5 个号码</small></div>
+          <div id="frontResults" class="ball-row"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="result-group back-group">
+          <div class="result-meta"><span class="blue-dot"></span><strong>后区</strong><small>2 个号码</small></div>
+          <div id="backResults" class="ball-row"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="startBtn" class="primary-btn"><span class="play-icon">▶</span><span>启动摇奖</span></button>
+        <button id="resetBtn" class="icon-btn" title="重置" aria-label="重置">↻</button>
+        <button id="soundBtn" class="icon-btn active" title="声音已开启" aria-label="关闭声音" aria-pressed="true">♪</button>
+        <label class="speed-control"><span>快速模式</span><input id="speedToggle" type="checkbox"><i></i></label>
+      </div>
+    </section>
+
+    <section class="history-card">
+      <div class="section-title">
+        <div><p class="eyebrow">DRAW HISTORY</p><h2>开奖记录</h2></div>
+        <button id="clearHistory" class="text-btn">清空记录</button>
+      </div>
+      <div id="historyList" class="history-list">
+        <div class="empty-state">完成一次摇奖后，号码会保存在这里</div>
+      </div>
+    </section>
+
+    <footer>仅供随机模拟与视觉演示，不代表任何官方开奖结果。</footer>
+  </main>
+
+  <div id="roomModal" class="room-modal" hidden>
+    <div class="room-backdrop" data-close-room></div>
+    <section class="room-dialog" role="dialog" aria-modal="true" aria-labelledby="roomTitle">
+      <button class="room-close" data-close-room aria-label="关闭">×</button>
+      <p class="eyebrow">REALTIME ROOM</p>
+      <h2 id="roomTitle">手机与电脑实时互通</h2>
+      <p class="room-intro">电脑创建房间，手机输入房间码即可遥控摇奖并同步查看结果。</p>
+
+      <div id="roomDisconnected">
+        <details id="cloudSettings" class="cloud-settings">
+          <summary><span>高级云端设置</span><small id="configState">免配置直连</small></summary>
+          <label>Project URL<input id="supabaseUrl" type="url" placeholder="https://xxxx.supabase.co" autocomplete="url"></label>
+          <label>Publishable Key<textarea id="supabaseKey" rows="3" placeholder="sb_publishable_..."></textarea></label>
+          <button id="saveCloudConfig" class="secondary-btn">保存连接设置</button>
+          <p class="config-note">默认使用免配置的浏览器直连；这里仅用于切换到自己的 Supabase 服务。切勿填写 Secret Key。</p>
+        </details>
+        <div class="room-actions">
+          <button id="createRoomBtn" class="room-action primary"><span>＋</span><strong>电脑创建房间</strong><small>作为摇奖主机</small></button>
+          <div class="join-card">
+            <div><strong>手机加入房间</strong><small>输入电脑显示的房间码</small></div>
+            <div class="join-row"><input id="joinRoomCode" maxlength="6" placeholder="房间码"><button id="joinRoomBtn">加入</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="roomConnected" class="room-connected" hidden>
+        <div class="connected-icon"><span></span></div>
+        <small id="roomRoleLabel">摇奖主机</small>
+        <strong id="activeRoomCode">------</strong>
+        <p id="connectionText">正在连接实时房间…</p>
+        <div class="room-link"><input id="shareRoomLink" readonly><button id="copyRoomLink">复制链接</button></div>
+        <div class="peer-line"><span><i></i><b id="peerCount">1</b> 台设备在线</span><small>房间状态实时同步</small></div>
+        <button id="leaveRoomBtn" class="leave-room">退出房间</button>
+      </div>
+      <p id="roomError" class="room-error" hidden></p>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="sync-config.js"></script>
+  <script src="realtime.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
